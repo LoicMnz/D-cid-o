@@ -23,7 +23,7 @@
 
 .header { align-items: center; margin-bottom: clamp(2.2rem, 7vh, 4rem); }
 .brand { align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 850; letter-spacing: -.04em; }
-.brand span { display: grid; width: 2.1rem; height: 2.1rem; place-items: center; border-radius: .65rem; color: var(--background); background: var(--ink); }
+.brand img { width: 2.1rem; height: 2.1rem; }
 
 .intro h1 { max-width: 12ch; margin: 0; font-size: clamp(2.4rem, 10vw, 4.5rem); font-weight: 850; letter-spacing: -.072em; line-height: .96; text-wrap: balance; }
 .intro > span { display: block; margin-top: .9rem; color: var(--muted); line-height: 1.5; }

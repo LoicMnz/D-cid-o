@@ -179,7 +179,10 @@ export default function App() {
     <main className={styles.app}>
       <div className={styles.shell}>
         <header className={styles.header}>
-          <div className={styles.brand}><span aria-hidden="true">✶</span>Décidéo</div>
+          <div className={styles.brand}>
+            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" aria-hidden="true" />
+            Décidéo
+          </div>
         </header>
 
         <section className={styles.intro}>
