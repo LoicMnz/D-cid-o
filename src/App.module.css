@@ -1,0 +1,94 @@
+.app {
+  --background: #f5f5f5;
+  --surface: #ffffff;
+  --surface-muted: #ededed;
+  --ink: #171717;
+  --muted: #6b6b6b;
+  --border: #dedede;
+  --button-ink: #ffffff;
+  min-height: 100svh;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--background);
+}
+
+.shell {
+  width: min(100%, 44rem);
+  min-height: 100svh;
+  margin: auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.header, .brand, .addForm, .listHeader, .cardActions, .status, .actions { display: flex; }
+
+.header { align-items: center; margin-bottom: clamp(2.2rem, 7vh, 4rem); }
+.brand { align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 850; letter-spacing: -.04em; }
+.brand span { display: grid; width: 2.1rem; height: 2.1rem; place-items: center; border-radius: .65rem; color: var(--background); background: var(--ink); }
+
+.intro h1 { max-width: 12ch; margin: 0; font-size: clamp(2.4rem, 10vw, 4.5rem); font-weight: 850; letter-spacing: -.072em; line-height: .96; text-wrap: balance; }
+.intro > span { display: block; margin-top: .9rem; color: var(--muted); line-height: 1.5; }
+
+.addForm { gap: .5rem; margin: 1.8rem 0 1.3rem; padding: .38rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); box-shadow: 0 .8rem 2rem rgb(0 0 0 / 6%); }
+.addForm input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--ink); background: transparent; padding: 0 .75rem; font-size: 1rem; }
+.addForm input::placeholder { color: var(--muted); }
+.addForm button { height: 3rem; border: 0; border-radius: .72rem; padding: 0 1rem; color: var(--button-ink); background: var(--ink); font-weight: 800; }
+.addForm button:disabled, .draw:disabled { opacity: .45; }
+
+.listHeader { min-height: 2rem; align-items: center; justify-content: space-between; margin-bottom: .7rem; color: var(--muted); font-size: .78rem; }
+.listHeader button { border: 0; color: var(--muted); background: transparent; font-size: .75rem; }
+.listHeader strong { color: var(--ink); }
+
+.game { min-height: 15rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.card { position: relative; display: flex; min-width: 0; min-height: 7.8rem; flex-direction: column; justify-content: flex-end; padding: .9rem; overflow: visible; border: 1px solid var(--border); border-radius: 1.2rem; background: var(--surface); }
+.card small { position: absolute; top: .75rem; left: .85rem; opacity: .45; font-weight: 850; letter-spacing: .08em; }
+.card h2 { max-width: calc(100% - 2.5rem); margin: 0; overflow: hidden; font-size: clamp(1.1rem, 4.6vw, 1.55rem); font-weight: 850; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
+.cardActions { position: absolute; top: .45rem; right: .45rem; align-items: center; gap: .15rem; }
+.cardActions button { min-height: 2rem; border: 0; border-radius: 2rem; padding: 0 .5rem; color: var(--muted); background: var(--surface-muted); font-size: .65rem; }
+.cardActions button:last-child { width: 2rem; padding: 0; font-size: 1.2rem; }
+.active { z-index: 2; border-color: var(--ink); box-shadow: 0 0 0 3px rgb(128 128 128 / 25%); }
+.winner { grid-column: 1 / -1; min-height: 12rem; align-items: center; justify-content: center; color: var(--button-ink); text-align: center; background: var(--ink); box-shadow: 0 1.2rem 3rem rgb(0 0 0 / 18%); }
+.winner h2 { max-width: 92%; font-size: clamp(2rem, 10vw, 3.8rem); white-space: normal; }
+.winner small { display: none; }
+.winner em { margin-top: .7rem; padding: .3rem .6rem; border: 1px solid currentColor; border-radius: 2rem; font-size: .67rem; font-style: normal; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+
+.edit { display: grid; gap: .5rem; }
+.edit input { width: 100%; border: 0; border-bottom: 2px solid var(--border); outline: 0; color: var(--ink); background: transparent; font-weight: 800; }
+.edit div { display: flex; justify-content: flex-end; gap: .3rem; }
+.edit button { border: 0; border-radius: 1rem; padding: .3rem .55rem; color: var(--ink); background: var(--surface-muted); font-size: .65rem; }
+
+.empty { display: grid; min-height: 15rem; place-items: center; align-content: center; gap: .3rem; border: 1px dashed var(--border); border-radius: 1.2rem; color: var(--muted); text-align: center; }
+.empty b { color: var(--ink); font-size: 1.8rem; }
+.empty strong { color: var(--ink); font-size: 1.15rem; }
+.empty span { font-size: .82rem; }
+
+.status { min-height: 3.4rem; flex-direction: column; align-items: center; justify-content: center; padding-top: .6rem; color: var(--muted); font-size: .82rem; text-align: center; }
+.status strong { color: var(--ink); font-size: 1.1rem; }
+.actions { position: sticky; bottom: max(.75rem, env(safe-area-inset-bottom)); z-index: 4; flex-direction: column; gap: .5rem; margin-top: .5rem; }
+.actions button { width: 100%; min-height: 3.6rem; border-radius: .95rem; font-weight: 820; }
+.draw { border: 0; color: var(--button-ink); background: var(--ink); box-shadow: 0 .8rem 1.8rem rgb(0 0 0 / 12%); }
+.removeWinner { border: 1px solid var(--border); color: var(--ink); background: var(--surface); }
+
+@media (prefers-color-scheme: dark) {
+  .app {
+    --background: #0f0f0f;
+    --surface: #191919;
+    --surface-muted: #272727;
+    --ink: #f2f2f2;
+    --muted: #a1a1a1;
+    --border: #333333;
+    --button-ink: #111111;
+  }
+}
+
+@media (min-width: 42rem) {
+  .shell { padding-inline: 1.5rem; }
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .actions { flex-direction: row; }
+}
+
+@media (max-width: 23rem) {
+  .addForm { flex-direction: column; }
+  .addForm input { min-height: 2.8rem; }
+  .card { min-height: 7rem; padding: .75rem; }
+}

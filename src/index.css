@@ -1,0 +1,26 @@
+:root {
+  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #171717;
+  background: #f5f5f5;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: #f5f5f5; -webkit-tap-highlight-color: transparent; }
+body { min-width: 320px; min-height: 100vh; margin: 0; }
+button, input { font: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+button:focus-visible, input:focus-visible { outline: 3px solid #7c7c7c66; outline-offset: 2px; }
+::selection { color: #ffffff; background: #333333; }
+
+@media (prefers-color-scheme: dark) {
+  :root, html { color: #f2f2f2; background: #0f0f0f; }
+  ::selection { color: #111111; background: #dddddd; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
