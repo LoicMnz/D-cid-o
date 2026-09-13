@@ -1,9 +1,14 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import styles from './App.module.css';
 
 type Choice = { id: string; label: string; weight: number };
+type StatusMessage = {
+  key: string;
+  values?: Record<string, string | number>;
+};
 
 const STORAGE_KEY = 'decideo:choices:v2';
 const MIN_WEIGHT = 1;
@@ -57,6 +62,7 @@ function pickWeightedChoice(choices: Choice[]) {
 }
 
 export default function App() {
+  const { t, i18n } = useTranslation();
   const reduceMotion = useReducedMotion();
   const [choices, setChoices] = useState<Choice[]>([]);
   const [newLabel, setNewLabel] = useState('');
@@ -66,7 +72,7 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [message, setMessage] = useState('Ajoute au moins deux choix pour commencer.');
+  const [message, setMessage] = useState<StatusMessage>({ key: 'status.needTwo' });
   const [storageReady, setStorageReady] = useState(false);
 
   const visibleChoices = useMemo(
@@ -74,6 +80,14 @@ export default function App() {
     [choices, eliminated],
   );
   const winner = choices.find((choice) => choice.id === winnerId);
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.resolvedLanguage ?? 'fr';
+    document.title = t('meta.title');
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute('content', t('meta.description'));
+  }, [i18n.resolvedLanguage, t]);
 
   useEffect(() => {
     try {
@@ -90,29 +104,29 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(choices));
   }, [choices, storageReady]);
 
-  function reset(messageText = 'Prêt pour un nouveau plouf-plouf.') {
+  function reset(nextMessage: StatusMessage = { key: 'status.ready' }) {
     setEliminated(new Set());
     setActiveId(null);
     setWinnerId(null);
-    setMessage(messageText);
+    setMessage(nextMessage);
   }
 
   function addChoice(event: FormEvent) {
     event.preventDefault();
     const label = newLabel.trim().slice(0, 32);
-    if (!label) return setMessage('Donne un nom à ton choix.');
+    if (!label) return setMessage({ key: 'status.missingName' });
     if (choices.some((choice) => choice.label.toLowerCase() === label.toLowerCase())) {
-      return setMessage('Ce choix est déjà dans la grille.');
+      return setMessage({ key: 'status.duplicate' });
     }
 
     setChoices((current) => [...current, { id: crypto.randomUUID(), label, weight: MIN_WEIGHT }]);
     setNewLabel('');
-    reset(`« ${label} » rejoint la partie.`);
+    reset({ key: 'status.added', values: { label } });
   }
 
   function removeChoice(id: string) {
     setChoices((current) => current.filter((choice) => choice.id !== id));
-    reset('Choix retiré.');
+    reset({ key: 'status.removed' });
   }
 
   function beginEdit(choice: Choice) {
@@ -128,7 +142,7 @@ export default function App() {
       current.map((choice) => (choice.id === editingId ? { ...choice, label } : choice)),
     );
     setEditingId(null);
-    reset('Choix modifié.');
+    reset({ key: 'status.edited' });
   }
 
   function updateWeight(id: string, nextWeight: number) {
@@ -138,7 +152,7 @@ export default function App() {
         choice.id === id ? { ...choice, weight: clampWeight(nextWeight) } : choice,
       ),
     );
-    reset('Poids modifié.');
+    reset({ key: 'status.weightChanged' });
   }
 
   async function draw() {
@@ -148,7 +162,7 @@ export default function App() {
     setEliminated(new Set());
     setWinnerId(null);
     setIsRunning(true);
-    setMessage('Plouf… plouf…');
+    setMessage({ key: 'status.drawing' });
 
     const winner = pickWeightedChoice(choices);
     const losers = shuffle(choices.filter((choice) => choice.id !== winner).map((choice) => choice.id));
@@ -172,7 +186,7 @@ export default function App() {
     setActiveId(winner);
     setWinnerId(winner);
     setIsRunning(false);
-    setMessage('C’est décidé !');
+    setMessage({ key: 'status.decided' });
   }
 
   return (
@@ -186,34 +200,40 @@ export default function App() {
         </header>
 
         <section className={styles.intro}>
-          <h1>Qu’est-ce qui te fait envie ?</h1>
-          <span>Fais ton choix.</span>
+          <h1>{t('intro.title')}</h1>
+          <span>{t('intro.subtitle')}</span>
         </section>
 
         <form className={styles.addForm} onSubmit={addChoice}>
           <input
             value={newLabel}
             onChange={(event) => setNewLabel(event.target.value)}
-            placeholder="Ex. Ramen"
-            aria-label="Nouveau choix"
+            placeholder={t('choices.newPlaceholder')}
+            aria-label={t('choices.newLabel')}
             maxLength={32}
             disabled={isRunning}
           />
-          <button type="submit" disabled={isRunning}><b aria-hidden="true">＋</b> Ajouter</button>
+          <button type="submit" disabled={isRunning}><b aria-hidden="true">＋</b> {t('choices.add')}</button>
         </form>
 
         <div className={styles.listHeader}>
-          <span><strong>{choices.length}</strong> choix</span>
+          <span>
+            <Trans
+              i18nKey="choices.count"
+              count={choices.length}
+              components={{ strong: <strong /> }}
+            />
+          </span>
           {choices.length > 0 && !isRunning && (
-            <button onClick={() => { setChoices([]); reset('Ajoute une nouvelle envie.'); }}>
-              Tout effacer
+            <button onClick={() => { setChoices([]); reset({ key: 'status.addNew' }); }}>
+              {t('choices.clearAll')}
             </button>
           )}
         </div>
 
-        <section className={styles.game} aria-label="Grille des choix">
+        <section className={styles.game} aria-label={t('choices.gridLabel')}>
           {choices.length === 0 ? (
-            <div className={styles.empty}><b>✶</b><strong>La grille t’attend</strong><span>Ajoute au moins deux possibilités.</span></div>
+            <div className={styles.empty}><b>✶</b><strong>{t('choices.emptyTitle')}</strong><span>{t('choices.emptyDescription')}</span></div>
           ) : (
             <motion.div className={styles.grid} layout>
               <AnimatePresence mode="popLayout">
@@ -233,7 +253,7 @@ export default function App() {
                       {editingId === choice.id ? (
                         <form className={styles.edit} onSubmit={saveEdit}>
                           <input autoFocus value={editingLabel} onChange={(event) => setEditingLabel(event.target.value)} maxLength={32} />
-                          <div><button type="submit">Valider</button><button type="button" onClick={() => setEditingId(null)}>Annuler</button></div>
+                          <div><button type="submit">{t('choices.validate')}</button><button type="button" onClick={() => setEditingId(null)}>{t('choices.cancel')}</button></div>
                         </form>
                       ) : (
                         <>
@@ -242,15 +262,15 @@ export default function App() {
                           {!isRunning && !winnerId && (
                             <>
                               <div className={styles.cardActions}>
-                                <button aria-label={`Modifier ${choice.label}`} onClick={() => beginEdit(choice)}>Modifier</button>
-                                <button aria-label={`Supprimer ${choice.label}`} onClick={() => removeChoice(choice.id)}>×</button>
+                                <button aria-label={t('choices.editLabel', { label: choice.label })} onClick={() => beginEdit(choice)}>{t('choices.edit')}</button>
+                                <button aria-label={t('choices.deleteLabel', { label: choice.label })} onClick={() => removeChoice(choice.id)}>×</button>
                               </div>
                               <div className={styles.weightEditor}>
-                                <span>Poids</span>
+                                <span>{t('choices.weight')}</span>
                                 <div className={styles.weightControl}>
                                   <button
                                     type="button"
-                                    aria-label={`Diminuer le poids de ${choice.label}`}
+                                    aria-label={t('choices.decreaseWeightLabel', { label: choice.label })}
                                     disabled={choice.weight <= MIN_WEIGHT}
                                     onClick={() => updateWeight(choice.id, choice.weight - 1)}
                                   >−</button>
@@ -260,12 +280,12 @@ export default function App() {
                                     max={MAX_WEIGHT}
                                     inputMode="numeric"
                                     value={choice.weight}
-                                    aria-label={`Poids de ${choice.label}`}
+                                    aria-label={t('choices.weightLabel', { label: choice.label })}
                                     onChange={(event) => updateWeight(choice.id, event.currentTarget.valueAsNumber)}
                                   />
                                   <button
                                     type="button"
-                                    aria-label={`Augmenter le poids de ${choice.label}`}
+                                    aria-label={t('choices.increaseWeightLabel', { label: choice.label })}
                                     disabled={choice.weight >= MAX_WEIGHT}
                                     onClick={() => updateWeight(choice.id, choice.weight + 1)}
                                   >+</button>
@@ -273,7 +293,7 @@ export default function App() {
                               </div>
                             </>
                           )}
-                          {isWinner && <em>Le choix du hasard</em>}
+                          {isWinner && <em>{t('choices.winnerBadge')}</em>}
                         </>
                       )}
                     </motion.article>
@@ -285,14 +305,14 @@ export default function App() {
         </section>
 
         <output className={styles.status} aria-live="polite">
-          <span>{message}</span>{winner && <strong>{winner.label}</strong>}
+          <span>{t(message.key, message.values)}</span>{winner && <strong>{winner.label}</strong>}
         </output>
 
         <div className={styles.actions}>
           <button className={styles.draw} onClick={() => void draw()} disabled={choices.length < 2 || isRunning}>
-            {winner ? '↻ Rejouer' : isRunning ? 'Plouf… plouf…' : '✶ Lancer le plouf-plouf'}
+            {winner ? t('actions.replay') : isRunning ? t('actions.drawing') : t('actions.draw')}
           </button>
-          {winner && <button className={styles.removeWinner} onClick={() => removeChoice(winner.id)}>Retirer {winner.label}</button>}
+          {winner && <button className={styles.removeWinner} onClick={() => removeChoice(winner.id)}>{t('actions.removeWinner', { label: winner.label })}</button>}
         </div>
       </div>
     </main>

@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "title": "Décidéo : Laisse le hasard choisir",
+    "description": "Un plouf-plouf simple et ludique pour choisir entre toutes tes envies."
+  },
+  "intro": {
+    "title": "Qu’est-ce qui te fait envie ?",
+    "subtitle": "Fais ton choix."
+  },
+  "choices": {
+    "newPlaceholder": "Ex. Ramen",
+    "newLabel": "Nouveau choix",
+    "add": "Ajouter",
+    "count_one": "<strong>{{count}}</strong> choix",
+    "count_other": "<strong>{{count}}</strong> choix",
+    "clearAll": "Tout effacer",
+    "gridLabel": "Grille des choix",
+    "emptyTitle": "Aucun choix pour l’instant",
+    "emptyDescription": "Ajoute au moins deux possibilités.",
+    "validate": "Valider",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "editLabel": "Modifier {{label}}",
+    "deleteLabel": "Supprimer {{label}}",
+    "weight": "Poids",
+    "decreaseWeightLabel": "Diminuer le poids de {{label}}",
+    "weightLabel": "Poids de {{label}}",
+    "increaseWeightLabel": "Augmenter le poids de {{label}}",
+    "winnerBadge": "Le choix du hasard"
+  },
+  "status": {
+    "needTwo": "Ajoute au moins deux choix pour commencer.",
+    "ready": "Prêt pour un nouveau plouf-plouf.",
+    "missingName": "Donne un nom à ton choix.",
+    "duplicate": "Ce choix est déjà dans la grille.",
+    "added": "« {{label}} » rejoint la partie.",
+    "removed": "Choix retiré.",
+    "edited": "Choix modifié.",
+    "weightChanged": "Poids modifié.",
+    "drawing": "Plouf… plouf…",
+    "decided": "C’est décidé !",
+    "addNew": "Ajoute une nouvelle envie."
+  },
+  "actions": {
+    "replay": "↻ Rejouer",
+    "drawing": "Plouf… plouf…",
+    "draw": "✶ Lancer le plouf-plouf",
+    "removeWinner": "Retirer {{label}}"
+  }
+}

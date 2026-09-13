@@ -1,6 +1,6 @@
 # Décidéo
 
-Laisse le hasard choisir avec un plouf-plouf animé, pensé d’abord pour iPhone.
+Laisse le hasard choisir avec un plouf-plouf animé, pensé d’abord pour smartphone.
 
 ```bash
 pnpm install
