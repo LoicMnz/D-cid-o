@@ -19,7 +19,7 @@
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.25rem, env(safe-area-inset-bottom));
 }
 
-.header, .brand, .addForm, .listHeader, .cardActions, .status, .actions { display: flex; }
+.header, .brand, .addForm, .listHeader, .cardActions, .weightControl, .status, .actions { display: flex; }
 
 .header { align-items: center; margin-bottom: clamp(2.2rem, 7vh, 4rem); }
 .brand { align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 850; letter-spacing: -.04em; }
@@ -40,14 +40,23 @@
 
 .game { min-height: 15rem; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
-.card { position: relative; display: flex; min-width: 0; min-height: 7.8rem; flex-direction: column; justify-content: flex-end; padding: .9rem; overflow: visible; border: 1px solid var(--border); border-radius: 1.2rem; background: var(--surface); }
+.card { position: relative; display: flex; min-width: 0; min-height: 9.5rem; flex-direction: column; justify-content: flex-end; padding: .9rem .9rem 3.85rem; overflow: visible; border: 1px solid var(--border); border-radius: 1.2rem; background: var(--surface); }
 .card small { position: absolute; top: .75rem; left: .85rem; opacity: .45; font-weight: 850; letter-spacing: .08em; }
 .card h2 { max-width: calc(100% - 2.5rem); margin: 0; overflow: hidden; font-size: clamp(1.1rem, 4.6vw, 1.55rem); font-weight: 850; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
 .cardActions { position: absolute; top: .45rem; right: .45rem; align-items: center; gap: .15rem; }
 .cardActions button { min-height: 2rem; border: 0; border-radius: 2rem; padding: 0 .5rem; color: var(--muted); background: var(--surface-muted); font-size: .65rem; }
 .cardActions button:last-child { width: 2rem; padding: 0; font-size: 1.2rem; }
+.weightEditor { position: absolute; right: .65rem; bottom: .6rem; display: grid; gap: .15rem; }
+.weightEditor > span { padding-right: .2rem; color: var(--muted); font-size: .55rem; font-weight: 800; letter-spacing: .08em; line-height: 1; text-align: right; text-transform: uppercase; }
+.weightControl { align-items: center; padding: .15rem; border-radius: .65rem; background: var(--surface-muted); }
+.weightControl button, .weightControl input { width: 1.8rem; height: 1.75rem; border: 0; color: var(--ink); background: transparent; text-align: center; }
+.weightControl button { border-radius: .5rem; font-size: 1rem; line-height: 1; }
+.weightControl button:hover:not(:disabled) { background: var(--surface); }
+.weightControl button:disabled { cursor: default; opacity: .3; }
+.weightControl input { border-radius: .45rem; background: var(--surface); font-size: .72rem; font-weight: 850; appearance: textfield; }
+.weightControl input::-webkit-inner-spin-button, .weightControl input::-webkit-outer-spin-button { margin: 0; appearance: none; }
 .active { z-index: 2; border-color: var(--ink); box-shadow: 0 0 0 3px rgb(128 128 128 / 25%); }
-.winner { grid-column: 1 / -1; min-height: 12rem; align-items: center; justify-content: center; color: var(--button-ink); text-align: center; background: var(--ink); box-shadow: 0 1.2rem 3rem rgb(0 0 0 / 18%); }
+.winner { grid-column: 1 / -1; min-height: 12rem; align-items: center; justify-content: center; padding-bottom: .9rem; color: var(--button-ink); text-align: center; background: var(--ink); box-shadow: 0 1.2rem 3rem rgb(0 0 0 / 18%); }
 .winner h2 { max-width: 92%; font-size: clamp(2rem, 10vw, 3.8rem); white-space: normal; }
 .winner small { display: none; }
 .winner em { margin-top: .7rem; padding: .3rem .6rem; border: 1px solid currentColor; border-radius: 2rem; font-size: .67rem; font-style: normal; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
@@ -90,5 +99,6 @@
 @media (max-width: 23rem) {
   .addForm { flex-direction: column; }
   .addForm input { min-height: 2.8rem; }
-  .card { min-height: 7rem; padding: .75rem; }
+  .card { min-height: 9rem; padding: .75rem .75rem 3.7rem; }
+  .winner { padding-bottom: .75rem; }
 }

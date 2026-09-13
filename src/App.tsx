@@ -3,9 +3,11 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import styles from './App.module.css';
 
-type Choice = { id: string; label: string };
+type Choice = { id: string; label: string; weight: number };
 
 const STORAGE_KEY = 'decideo:choices:v2';
+const MIN_WEIGHT = 1;
+const MAX_WEIGHT = 99;
 const wait = (milliseconds: number) =>
   new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
@@ -22,6 +24,36 @@ function shuffle<T>(values: T[]) {
     [result[index], result[other]] = [result[other], result[index]];
   }
   return result;
+}
+
+function clampWeight(weight: number) {
+  return Math.min(MAX_WEIGHT, Math.max(MIN_WEIGHT, Math.round(weight)));
+}
+
+function normalizeChoices(value: unknown): Choice[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const choice = item as Partial<Choice>;
+    if (typeof choice.id !== 'string' || typeof choice.label !== 'string') return [];
+    const weight = typeof choice.weight === 'number' && Number.isFinite(choice.weight)
+      ? clampWeight(choice.weight)
+      : MIN_WEIGHT;
+    return [{ id: choice.id, label: choice.label, weight }];
+  });
+}
+
+function pickWeightedChoice(choices: Choice[]) {
+  const totalWeight = choices.reduce((total, choice) => total + choice.weight, 0);
+  let target = (randomIndex(0x100000000) / 0x100000000) * totalWeight;
+
+  for (const choice of choices) {
+    target -= choice.weight;
+    if (target < 0) return choice.id;
+  }
+
+  return choices.at(-1)!.id;
 }
 
 export default function App() {
@@ -46,7 +78,7 @@ export default function App() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setChoices(JSON.parse(saved) as Choice[]);
+      if (saved) setChoices(normalizeChoices(JSON.parse(saved)));
     } catch {
       // Le stockage local est un confort, pas une condition de fonctionnement.
     }
@@ -73,7 +105,7 @@ export default function App() {
       return setMessage('Ce choix est déjà dans la grille.');
     }
 
-    setChoices((current) => [...current, { id: crypto.randomUUID(), label }]);
+    setChoices((current) => [...current, { id: crypto.randomUUID(), label, weight: MIN_WEIGHT }]);
     setNewLabel('');
     reset(`« ${label} » rejoint la partie.`);
   }
@@ -99,6 +131,16 @@ export default function App() {
     reset('Choix modifié.');
   }
 
+  function updateWeight(id: string, nextWeight: number) {
+    if (!Number.isFinite(nextWeight)) return;
+    setChoices((current) =>
+      current.map((choice) =>
+        choice.id === id ? { ...choice, weight: clampWeight(nextWeight) } : choice,
+      ),
+    );
+    reset('Poids modifié.');
+  }
+
   async function draw() {
     if (choices.length < 2 || isRunning) return;
 
@@ -108,9 +150,8 @@ export default function App() {
     setIsRunning(true);
     setMessage('Plouf… plouf…');
 
-    const order = shuffle(choices.map((choice) => choice.id));
-    const winner = order.at(-1)!;
-    const losers = order.slice(0, -1);
+    const winner = pickWeightedChoice(choices);
+    const losers = shuffle(choices.filter((choice) => choice.id !== winner).map((choice) => choice.id));
     let remaining = choices.map((choice) => choice.id);
 
     for (const loser of losers) {
@@ -196,10 +237,38 @@ export default function App() {
                           <small>{String(index + 1).padStart(2, '0')}</small>
                           <h2>{choice.label}</h2>
                           {!isRunning && !winnerId && (
-                            <div className={styles.cardActions}>
-                              <button aria-label={`Modifier ${choice.label}`} onClick={() => beginEdit(choice)}>Modifier</button>
-                              <button aria-label={`Supprimer ${choice.label}`} onClick={() => removeChoice(choice.id)}>×</button>
-                            </div>
+                            <>
+                              <div className={styles.cardActions}>
+                                <button aria-label={`Modifier ${choice.label}`} onClick={() => beginEdit(choice)}>Modifier</button>
+                                <button aria-label={`Supprimer ${choice.label}`} onClick={() => removeChoice(choice.id)}>×</button>
+                              </div>
+                              <div className={styles.weightEditor}>
+                                <span>Poids</span>
+                                <div className={styles.weightControl}>
+                                  <button
+                                    type="button"
+                                    aria-label={`Diminuer le poids de ${choice.label}`}
+                                    disabled={choice.weight <= MIN_WEIGHT}
+                                    onClick={() => updateWeight(choice.id, choice.weight - 1)}
+                                  >−</button>
+                                  <input
+                                    type="number"
+                                    min={MIN_WEIGHT}
+                                    max={MAX_WEIGHT}
+                                    inputMode="numeric"
+                                    value={choice.weight}
+                                    aria-label={`Poids de ${choice.label}`}
+                                    onChange={(event) => updateWeight(choice.id, event.currentTarget.valueAsNumber)}
+                                  />
+                                  <button
+                                    type="button"
+                                    aria-label={`Augmenter le poids de ${choice.label}`}
+                                    disabled={choice.weight >= MAX_WEIGHT}
+                                    onClick={() => updateWeight(choice.id, choice.weight + 1)}
+                                  >+</button>
+                                </div>
+                              </div>
+                            </>
                           )}
                           {isWinner && <em>Le choix du hasard</em>}
                         </>
