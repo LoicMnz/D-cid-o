@@ -7,4 +7,11 @@ pnpm install
 pnpm dev
 ```
 
-La branche par défaut est automatiquement publiée sur GitLab Pages.
+## Publication sur GitHub Pages
+
+Chaque push sur la branche `main` compile et publie automatiquement l'application
+avec GitHub Actions.
+
+Dans les paramètres du dépôt GitHub, ouvrir **Settings > Pages** et choisir
+**GitHub Actions** comme source de publication. L'adresse du site est affichée à
+la fin du workflow **Deploy to GitHub Pages**.
